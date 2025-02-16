@@ -1,4 +1,5 @@
-//require('dotenv').config();      - enable for local testing
+require('dotenv').config();     
+
 
 const express = require('express');
 const app = express();
