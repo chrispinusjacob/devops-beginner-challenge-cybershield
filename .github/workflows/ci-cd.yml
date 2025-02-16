@@ -33,7 +33,7 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
         run: |
-          npm install -g railway
+          npm install -g @railway/cli
           railway up --token $RAILWAY_TOKEN --project $RAILWAY_PROJECT_ID --detach
 
       - name: Deploy to Local Server via SSH
@@ -46,4 +46,4 @@ jobs:
             docker pull cjke/devops-beginner-challenge-cybershield:latest
             docker stop devops-beginner-challenge-cybershield || true
             docker rm devops-beginner-challenge-cybershield || true
-            docker run -d -p 3000:3000 --name devops-beginner-challenge-cybershield cjke/devops-beginner-challenge-cybershield:latest
+            docker run -d -p 5000:5000 --name devops-beginner-challenge-cybershield cjke/devops-beginner-challenge-cybershield:latest
