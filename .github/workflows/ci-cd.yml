@@ -10,32 +10,40 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and Push Docker Image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: true
           tags: cjke/devops-beginner-challenge-cybershield:latest
 
-      - name: Deploy to Server via SSH
-        uses: appleboy/ssh-action@v0.1.5
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: |
+          npm install -g railway
+          railway up --token $RAILWAY_TOKEN --project $RAILWAY_PROJECT_ID --detach
+
+      - name: Deploy to Local Server via SSH
+        uses: appleboy/ssh-action@v0.1.9
         with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
+          host: ${{ secrets.LOCAL_SERVER_SSH_HOST }}
+          username: ${{ secrets.LOCAL_SERVER_SSH_USER }}
+          key: ${{ secrets.LOCAL_SERVER_SSH_KEY }}
           script: |
             docker pull cjke/devops-beginner-challenge-cybershield:latest
             docker stop devops-beginner-challenge-cybershield || true
             docker rm devops-beginner-challenge-cybershield || true
-            docker run -d -p 5000:5000 --name devops-beginner-challenge-cybershield cjke/devops-beginner-challenge-cybershield:latest
+            docker run -d -p 3000:3000 --name devops-beginner-challenge-cybershield cjke/devops-beginner-challenge-cybershield:latest
