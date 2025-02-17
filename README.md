@@ -1,7 +1,7 @@
 # DevOps Beginner Challenge: Automate a Web App Deployment
 
 ## Objective
-Deploy a simple **Node.js (Express)** web application using **Docker** and set up a **CI/CD pipeline** using **GitHub Actions**, deploying to **Railway**.
+Deploying a simple **Node.js (Express)** web application using **Docker** and set up a **CI/CD pipeline** using **GitHub Actions**, deploying to **Railway**.
 
 ---
 
