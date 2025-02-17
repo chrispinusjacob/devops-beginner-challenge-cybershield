@@ -36,23 +36,26 @@ jobs:
     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
   run: |
+    set -x  # Enable command trace for debugging
+    echo "=== Starting Railway Deployment Step ==="
+    
+    # Install Railway CLI
     npm install -g @railway/cli
+
+    # Log in to Railway using the token
+    echo "Logging in to Railway"
     echo $RAILWAY_TOKEN | railway login
+
+    # Link your project
+    echo "Linking Railway project with ID: $RAILWAY_PROJECT_ID"
     railway link $RAILWAY_PROJECT_ID
+
+    # Take down any existing deployment (ignore errors if not found)
+    echo "Taking down existing Railway deployment (if any)"
     railway down --detach || true
+
+    # Bring up a new deployment forcing a refresh
+    echo "Starting new Railway deployment"
     railway up --detach --force
 
-  
-
-
-      - name: Deploy to Local Server via SSH
-        uses: appleboy/ssh-action@v0.1.9
-        with:
-          host: ${{ secrets.LOCAL_SERVER_SSH_HOST }}
-          username: ${{ secrets.LOCAL_SERVER_SSH_USER }}
-          key: ${{ secrets.LOCAL_SERVER_SSH_KEY }}
-          script: |
-            docker pull cjke/devops-beginner-challenge-cybershield:${{ github.sha }}
-            docker stop devops-beginner-challenge-cybershield || true
-            docker rm devops-beginner-challenge-cybershield || true
-            docker run -d -p 5000:5000 --name devops-beginner-challenge-cybershield cjke/devops-beginner-challenge-cybershield:${{ github.sha }}
+    echo "=== Railway Deployment Step Completed ==="
