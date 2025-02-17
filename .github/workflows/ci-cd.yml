@@ -30,15 +30,16 @@ jobs:
             cjke/devops-beginner-challenge-cybershield:latest
             cjke/devops-beginner-challenge-cybershield:${{ github.sha }}
 
-      - name: Deploy to Railway
+          - name: Deploy to Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
         run: |
           npm install -g @railway/cli
-          echo $RAILWAY_TOKEN | railway auth login --token
+          echo $RAILWAY_TOKEN | railway login
           railway down --service my-service-name --project $RAILWAY_PROJECT_ID
           railway up --service my-service-name --project $RAILWAY_PROJECT_ID --image cjke/devops-beginner-challenge-cybershield:${{ github.sha }} --detach --force
+
 
       - name: Deploy to Local Server via SSH
         uses: appleboy/ssh-action@v0.1.9
