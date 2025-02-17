@@ -30,15 +30,15 @@ jobs:
             cjke/devops-beginner-challenge-cybershield:latest
             cjke/devops-beginner-challenge-cybershield:${{ github.sha }}
 
-- name: Deploy to Railway
-  env:
-    RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-    RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-  run: |
-    npm install -g @railway/cli
-    echo $RAILWAY_TOKEN | railway auth login --token
-    railway down --service my-service-name --project $RAILWAY_PROJECT_ID
-    railway up --service my-service-name --project $RAILWAY_PROJECT_ID --detach
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: |
+          npm install -g @railway/cli
+          echo $RAILWAY_TOKEN | railway auth login --token
+          railway down --service my-service-name --project $RAILWAY_PROJECT_ID
+          railway up --service my-service-name --project $RAILWAY_PROJECT_ID --image cjke/devops-beginner-challenge-cybershield:${{ github.sha }} --detach --force
 
       - name: Deploy to Local Server via SSH
         uses: appleboy/ssh-action@v0.1.9
@@ -47,7 +47,7 @@ jobs:
           username: ${{ secrets.LOCAL_SERVER_SSH_USER }}
           key: ${{ secrets.LOCAL_SERVER_SSH_KEY }}
           script: |
-            cd /path/to/app
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d
+            docker pull cjke/devops-beginner-challenge-cybershield:${{ github.sha }}
+            docker stop devops-beginner-challenge-cybershield || true
+            docker rm devops-beginner-challenge-cybershield || true
+            docker run -d -p 5000:5000 --name devops-beginner-challenge-cybershield cjke/devops-beginner-challenge-cybershield:${{ github.sha }}
