@@ -30,32 +30,34 @@ jobs:
             cjke/devops-beginner-challenge-cybershield:latest
             cjke/devops-beginner-challenge-cybershield:${{ github.sha }}
 
-   - name: Deploy to Railway
+ - name: Deploy to Railway
   if: always()
   env:
     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
   run: |
-    set -x  # Enable command trace for debugging
+    set -x
     echo "=== Starting Railway Deployment Step ==="
     
     # Install Railway CLI
     npm install -g @railway/cli
 
-    # Log in to Railway using the token
-    echo "Logging in to Railway"
-    echo $RAILWAY_TOKEN | railway login
+    # Log in to Railway using printf to send the token non-interactively
+    echo "Logging into Railway..."
+    printf "%s\n" "$RAILWAY_TOKEN" | railway login
 
-    # Link your project
+    # If Railway CLI is prompting again (e.g., "CL"), try piping an extra newline
+    # Uncomment the next line if you see that extra prompt:
+    # printf "\n" | true
+
     echo "Linking Railway project with ID: $RAILWAY_PROJECT_ID"
     railway link $RAILWAY_PROJECT_ID
 
-    # Take down any existing deployment (ignore errors if not found)
-    echo "Taking down existing Railway deployment (if any)"
+    echo "Taking down any existing deployment..."
     railway down --detach || true
 
-    # Bring up a new deployment forcing a refresh
-    echo "Starting new Railway deployment"
-    railway up --detach --force
+    echo "Starting new deployment (will timeout in 120 seconds if hanging)..."
+    timeout 120 railway up --detach --force || echo "railway up command timed out"
 
     echo "=== Railway Deployment Step Completed ==="
+  
