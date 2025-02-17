@@ -30,9 +30,16 @@ jobs:
             cjke/devops-beginner-challenge-cybershield:latest
             cjke/devops-beginner-challenge-cybershield:${{ github.sha }}
 
- - name: Deploy to Railway
+ - name: Link Railway project and deploy
   env:
     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
+    RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+    RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
   run: |
-    npm install -g @railway/cli
-    railway up --detach --force
+    set -x
+    # Link your repository to the Railway project
+    railway link --service=$RAILWAY_SERVICE_ID --project=$RAILWAY_PROJECT_ID --environment=$RAILWAY_ENVIRONMENT_ID
+    # Redeploy using the linked project; the token will be used automatically
+    railway redeploy --yes
+
